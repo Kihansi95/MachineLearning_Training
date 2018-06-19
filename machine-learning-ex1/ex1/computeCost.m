@@ -12,11 +12,10 @@ function J = computeCost(X, y, theta)
   % ====================== YOUR CODE HERE ======================
   % Instructions: Compute the cost of a particular choice of theta
   %               You should set J to the cost.
-  h = ones(m, 1);
-  for i=1:m,
-    h(i) = X(i,:) * theta;
-  end;
-  error = h - y;
+  
+  % h = X * theta;
+  % error = h - y;
+  error = X * theta - y;
   J = 1/(2*m) * (error' * error);
   % =========================================================================
   

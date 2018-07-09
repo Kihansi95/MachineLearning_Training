@@ -62,24 +62,57 @@ Theta2_grad = zeros(size(Theta2));
 %               and Theta2_grad from Part 2.
 %
 
+% transform y = x to vector
+for c = 1:max(y),
+   vectorized_y(:,c) = y == c;
+end;
 
+% calcul h
+a_1 = [ones(m, 1) X];
+z_2 = a_1 * Theta1';
+a_2 = [ones(size(z_2, 1),1) sigmoid(z_2)];
+h = sigmoid(a_2 * Theta2');
 
+% calcul cost function J
+J = (1/m) * sum(                                                                ...
+          sum( -vectorized_y .* log(h) - (1 .- vectorized_y) .* log(1 - h),2)   ...
+      )                                                                         ...
+      + lambda / (2*m) * ( sum(                                                 ...
+          sum(                                                                  ...
+              (Theta1 .^2)(:,2:end)                                             ...
+          )                                                                     ...
+      )                                                                         ...
+      + sum(                                                                    ...
+          sum(                                                                  ...
+               (Theta2.^2)(:, 2:end)                                            ... 
+          )                                                                     ...
+      ))                                                                        ...
+  ;
 
+cumul_1 = Theta1_grad;
+cumul_2 = Theta2_grad;
+  
+% back propagation
+for t = 1:m,
+    a_1 = [1 X(t,:)];
+    z_2 = a_1 * Theta1';
+    a_2 = [1 sigmoid(z_2)];
+    z_3 = a_2 * Theta2';
+    a_3 = sigmoid(z_3);
+    
+    delta_3 = a_3 - vectorized_y(t,:);        
+    delta_2 = ((delta_3 * Theta2) .* [1 sigmoidGradient(z_2)] )(2:end);
+    
+    cumul_1 = cumul_1 + delta_2' .* a_1;
+    cumul_2 = cumul_2 + delta_3' .* a_2;
+end;
 
+cumul_1(:,2:end) += lambda * Theta1(:,2:end);
+cumul_2(:,2:end) += lambda * Theta2(:,2:end);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+Theta1_grad = (1/m) * cumul_1;
+Theta2_grad = (1/m) * cumul_2;
+  
 % -------------------------------------------------------------
 
 % =========================================================================
